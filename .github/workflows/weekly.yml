@@ -1,0 +1,70 @@
+name: AI Consumer Radar Weekly
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+    - cron: "0 2 * * 5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ai-consumer-radar-pages
+  cancel-in-progress: false
+
+jobs:
+  run-radar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run collector
+        run: python src/main.py daily
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1-mini' }}
+
+      - name: Generate weekly report
+        if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
+        run: python src/main.py weekly
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1-mini' }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          PUBLIC_REPORT_BASE_URL: ${{ vars.PUBLIC_REPORT_BASE_URL }}
+
+      - name: Commit reports and db
+        run: |
+          git config user.name "ai-radar-bot"
+          git config user.email "bot@example.com"
+          git add data/ reports/
+          git commit -m "update ai consumer radar" || echo "no changes"
+          git push
+
+      - name: Upload GitHub Pages artifact
+        if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: reports
+
+  deploy-pages:
+    if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
+    needs: run-radar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

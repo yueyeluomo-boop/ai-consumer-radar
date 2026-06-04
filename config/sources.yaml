@@ -1,0 +1,25 @@
+rss_sources:
+  - name: Product Hunt AI
+    url: https://www.producthunt.com/feed
+    type: product_discovery
+
+  - name: TechCrunch AI
+    url: https://techcrunch.com/category/artificial-intelligence/feed/
+    type: media
+
+  - name: a16z AI
+    url: https://a16z.com/category/ai/feed/
+    type: investor_media
+
+  - name: Reddit LocalLLaMA
+    url: https://www.reddit.com/r/LocalLLaMA/.rss
+    type: reddit
+
+web_sources:
+  - name: a16z Consumer AI Top 100
+    url: https://a16z.com/100-gen-ai-apps-6/
+    type: ranking
+
+  - name: Product Hunt AI
+    url: https://www.producthunt.com/topics/artificial-intelligence
+    type: product_discovery

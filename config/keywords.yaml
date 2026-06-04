@@ -1,0 +1,46 @@
+include:
+  - ai companion
+  - ai avatar
+  - ai video
+  - ai social
+  - ai live
+  - ai streaming
+  - ai ugc
+  - ai meme
+  - ai roleplay
+  - ai girlfriend
+  - ai boyfriend
+  - ai anime
+  - virtual streamer
+  - ai influencer
+  - interactive video
+  - ai entertainment
+  - ai character
+  - ai npc
+  - character ai
+  - anime ai
+  - ai chat
+  - ai story
+  - remix
+  - avatar
+  - companion
+  - roleplay
+  - virtual influencer
+
+exclude:
+  - enterprise
+  - b2b
+  - sales
+  - crm
+  - coding assistant
+  - customer support
+  - document
+  - spreadsheet
+  - workflow automation
+  - meeting notes
+  - ai for work
+  - devtools
+  - compliance
+  - contract
+  - procurement
+  - data warehouse
