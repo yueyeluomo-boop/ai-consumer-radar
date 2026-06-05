@@ -18,6 +18,7 @@ concurrency:
 jobs:
   run-radar:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +31,7 @@ jobs:
 
       - name: Run collector
         continue-on-error: true
+        timeout-minutes: 5
         run: python src/main.py daily
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -38,6 +40,7 @@ jobs:
       - name: Generate weekly report
         if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
         continue-on-error: true
+        timeout-minutes: 5
         run: python src/main.py weekly
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -46,6 +49,7 @@ jobs:
           PUBLIC_REPORT_BASE_URL: ${{ vars.PUBLIC_REPORT_BASE_URL }}
 
       - name: Commit reports and db
+        timeout-minutes: 2
         run: |
           git config user.name "ai-radar-bot"
           git config user.email "bot@example.com"
