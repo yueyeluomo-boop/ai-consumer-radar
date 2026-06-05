@@ -29,6 +29,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Run collector
+        continue-on-error: true
         run: python src/main.py daily
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -36,6 +37,7 @@ jobs:
 
       - name: Generate weekly report
         if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
         run: python src/main.py weekly
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -47,9 +49,10 @@ jobs:
         run: |
           git config user.name "ai-radar-bot"
           git config user.email "bot@example.com"
+          git pull --rebase || true
           git add data/ reports/
           git commit -m "update ai consumer radar" || echo "no changes"
-          git push
+          git push || echo "skip push"
 
       - name: Configure GitHub Pages
         if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
@@ -59,19 +62,20 @@ jobs:
         if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
         run: |
           if [ ! -f reports/index.html ]; then
+            mkdir -p reports
             cat > reports/index.html <<'EOF'
-          <!doctype html>
-          <html lang="zh-CN">
-          <head>
-            <meta charset="utf-8">
-            <title>AI Consumer Radar</title>
-          </head>
-          <body>
-            <h1>AI Consumer Radar</h1>
-            <p>The report generator ran, but no weekly report was created yet.</p>
-          </body>
-          </html>
-          EOF
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>AI Consumer Radar</title>
+</head>
+<body>
+  <h1>AI Consumer Radar</h1>
+  <p>The report generator ran, but no weekly report was created yet.</p>
+</body>
+</html>
+EOF
           fi
 
       - name: Upload GitHub Pages artifact
