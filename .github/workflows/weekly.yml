@@ -51,6 +51,29 @@ jobs:
           git commit -m "update ai consumer radar" || echo "no changes"
           git push
 
+      - name: Configure GitHub Pages
+        if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
+        uses: actions/configure-pages@v5
+
+      - name: Ensure Pages entrypoint
+        if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
+        run: |
+          if [ ! -f reports/index.html ]; then
+            cat > reports/index.html <<'EOF'
+          <!doctype html>
+          <html lang="zh-CN">
+          <head>
+            <meta charset="utf-8">
+            <title>AI Consumer Radar</title>
+          </head>
+          <body>
+            <h1>AI Consumer Radar</h1>
+            <p>The report generator ran, but no weekly report was created yet.</p>
+          </body>
+          </html>
+          EOF
+          fi
+
       - name: Upload GitHub Pages artifact
         if: github.event.schedule == '0 2 * * 5' || github.event_name == 'workflow_dispatch'
         uses: actions/upload-pages-artifact@v3
